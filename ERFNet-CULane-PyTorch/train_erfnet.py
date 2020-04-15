@@ -20,7 +20,7 @@ def main():
     global args, best_mIoU
     args = parser.parse_args()
 
-    #os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(gpu) for gpu in args.gpus)
+    os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(gpu) for gpu in args.gpus)
     #args.gpus = len(args.gpus)
 
     if args.dataset == 'VOCAug' or args.dataset == 'VOC2012' or args.dataset == 'COCO':
@@ -44,10 +44,8 @@ def main():
     input_mean = model.input_mean
     input_std = model.input_std
     
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
     model = model.cuda()
-    model = torch.nn.DataParallel(model, device_ids=[0, 1, 2, 3])
-    
+    model = torch.nn.DataParallel(model, device_ids=args.gpus)    
     #model = torch.nn.DataParallel(model, device_ids=range(args.gpus)).cuda()
 
     def load_my_state_dict(model, state_dict):  # custom function to load model when not all dict elements
