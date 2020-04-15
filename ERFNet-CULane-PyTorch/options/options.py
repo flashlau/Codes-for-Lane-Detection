@@ -24,8 +24,8 @@ parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='mo
 parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float, metavar='W', help='weight decay (default: 5e-4)')
 
 # ========================= Monitor Configs ==========================
-parser.add_argument('--print_freq', '-p', default=1, type=int, metavar='N', help='print frequency (default: 10)')
-parser.add_argument('--eval_freq', '-ef', default=1, type=int, metavar='N', help='evaluation frequency (default: 5)')
+parser.add_argument('--print_freq', '-p', default=10, type=int, metavar='N', help='print frequency (default: 10)')
+parser.add_argument('--eval_freq', '-ef', default=5, type=int, metavar='N', help='evaluation frequency (default: 5)')
 
 # ========================= Runtime Configs ==========================
 parser.add_argument('-j', '--workers', default=16, type=int, metavar='N', help='number of data loading workers (default: 16)')
