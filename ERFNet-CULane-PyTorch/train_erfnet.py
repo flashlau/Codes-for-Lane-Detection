@@ -20,8 +20,8 @@ def main():
     global args, best_mIoU
     args = parser.parse_args()
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(gpu) for gpu in args.gpus)
-    args.gpus = len(args.gpus)
+    #os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(gpu) for gpu in args.gpus)
+    #args.gpus = len(args.gpus)
 
     if args.dataset == 'VOCAug' or args.dataset == 'VOC2012' or args.dataset == 'COCO':
         num_class = 21
@@ -43,7 +43,12 @@ def main():
     model = models.ERFNet(num_class)
     input_mean = model.input_mean
     input_std = model.input_std
-    model = torch.nn.DataParallel(model, device_ids=range(args.gpus)).cuda()
+    
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
+    model = model.cuda()
+    model = torch.nn.DataParallel(model, device_ids=[0, 1, 2, 3])
+    
+    #model = torch.nn.DataParallel(model, device_ids=range(args.gpus)).cuda()
 
     def load_my_state_dict(model, state_dict):  # custom function to load model when not all dict elements
         own_state = model.state_dict()
@@ -97,7 +102,7 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
     evaluator = EvalSegmentation(num_class, ignore_label)
 
-    args.evaluate = True
+    args.evaluate = False #True
 
     if args.evaluate:
         validate(val_loader, model, criterion, 0, evaluator)
@@ -166,7 +171,7 @@ def train(train_loader, model, criterion, criterion_exist, optimizer, epoch):
         if (i + 1) % args.print_freq == 0:
             print((
                       'Epoch: [{0}][{1}/{2}], lr: {lr:.5f}\t' 'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t' 'Data {data_time.val:.3f} ({data_time.avg:.3f})\t' 'Loss {loss.val:.4f} ({loss.avg:.4f})\t' 'Loss_exist {loss_exist.val:.4f} ({loss_exist.avg:.4f})\t'.format(
-                          epoch, i, len(train_loader), batch_time=batch_time, data_time=data_time, loss=losses,
+                          epoch, i+1, len(train_loader), batch_time=batch_time, data_time=data_time, loss=losses,
                           loss_exist=losses_exist, lr=optimizer.param_groups[-1]['lr'])))
             batch_time.reset()
             data_time.reset()
